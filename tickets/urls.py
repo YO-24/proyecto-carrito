@@ -17,6 +17,8 @@ urlpatterns = [
     
     # Rutas privadas del Espectador
     path('carro-tickets/', CarroViewSet.as_view({'get': 'list', 'post': 'create'})),
+    path('carro/items/<int:pk>/', CarroViewSet.as_view({'delete': 'destroy'})),
+    path('compras/pagar/', CheckoutView.as_view()),
     path('compras/pagar/', CheckoutView.as_view()),
     path('mis-tickets/', MisTicketsView.as_view(), name='mis-tickets'),
     path('mi-carro/', MiCarroView.as_view(), name='mi-carro'),

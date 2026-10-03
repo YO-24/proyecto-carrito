@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.views.decorators.csrf import csrf_exempt
 
 # --- NUEVA VISTA PÚBLICA (Catálogo) ---
 class EventoViewSet(viewsets.ReadOnlyModelViewSet):
@@ -27,10 +28,6 @@ class EventoViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['recinto__nombre', 'fecha_hora'] # Filtros exactos
     search_fields = ['nombre', 'artista'] # Búsqueda por texto (ej: ?search=rock)
-
-# --- VISTAS EXISTENTES (Carro y Checkout) ---
-class CarroViewSet(viewsets.ViewSet):
-    permission_classes = [IsEspectador]
 
 class CheckoutView(views.APIView):
     permission_classes = [IsEspectador]
@@ -50,7 +47,27 @@ class CarroViewSet(viewsets.ViewSet):
         carro, _ = Carro.objects.get_or_create(usuario=request.user)
         sector_id = request.data.get('sector_id')
         cantidad = int(request.data.get('cantidad', 1))
-
+   
+    def destroy(self, request, pk=None):
+        from .models import ItemCarro
+        try:
+            # 1. Intentamos buscar por el ID directo del ítem, asegurando que sea del usuario logueado
+            item = ItemCarro.objects.filter(pk=pk, carro__usuario=request.user).first()
+            
+            # 2. Si no lo encuentra, asumimos que el frontend envió el ID del Sector asociado
+            if not item:
+                item = ItemCarro.objects.filter(sector_id=pk, carro__usuario=request.user).first()
+                
+            # 3. Si por fin encontramos algo, lo borramos
+            if item:
+                item.delete()
+                return Response({"mensaje": "Entrada eliminada del carro"}, status=200)
+            else:
+                return Response({"error": "No se encontró el ítem en tu carro"}, status=404)
+                
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+        
         try:
             sector = Sector.objects.get(id=sector_id)
         except Sector.DoesNotExist:
@@ -97,12 +114,12 @@ class CheckoutView(views.APIView):
             # Emisión de tickets únicos[cite: 1]
             for _ in range(item.cantidad):
                 Ticket.objects.create(orden=orden, sector=sector)
-
+            
         # Transición a estado exitoso[cite: 1]
         orden.estado = 'PAGADO'
         orden.total = total_orden
         orden.save()
-
+        
         # Limpiar el carro persistente después de comprar
         items.delete()
 
