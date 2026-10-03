@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoleteraSO | Panel Organizador</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --tp-pink: #f2007a;
+            --tp-dark: #f8f9fa; 
+            --tp-bg: #121212;   
+            --tp-card: #1e1e1e; 
+            --tp-border: #333333;
+        }
+        body { background-color: var(--tp-bg); font-family: 'Poppins', sans-serif; color: var(--tp-dark); }
+        .navbar { background-color: rgba(18, 18, 18, 0.95) !important; border-bottom: 1px solid var(--tp-border); padding: 15px 0; }
+        .navbar-brand { color: var(--tp-pink) !important; font-weight: 700; font-size: 1.5rem; }
+        .btn-tp { background-color: var(--tp-pink); color: white; border-radius: 8px; font-weight: 600; padding: 10px 24px; border: none; }
+        .btn-tp:hover { background-color: #ff3399; color: white; }
+        .card-panel { background: var(--tp-card); border: 1px solid var(--tp-border); border-radius: 16px; }
+        .form-control { background-color: #2a2a2a; border: 1px solid var(--tp-border); color: white; border-radius: 8px; }
+        .form-control:focus { border-color: var(--tp-pink); background-color: #333; color: white; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="bi bi-shield-lock-fill me-2"></i>BoleteraSO | Productores</a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="index.html" class="text-secondary text-decoration-none small"><i class="bi bi-box-arrow-up-left me-1"></i>Ir a la tienda</a>
+                <button id="btn-auth" class="btn-tp" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar Sesión</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div id="mensaje-bloqueo" class="text-center py-5">
+            <i class="bi bi-lock text-secondary mb-3" style="font-size: 4rem;"></i>
+            <h3 class="fw-bold">Acceso Restringido</h3>
+            <p class="text-secondary">Debes iniciar sesión con una cuenta de Organizador para administrar eventos.</p>
+        </div>
+
+        <div id="panel-contenido" class="row d-none">
+            <!-- COLUMNA 1: CREAR EVENTO -->
+            <div class="col-lg-6 mb-4">
+                <div class="card-panel p-4 shadow-sm h-100">
+                    <h4 class="fw-bold mb-4 border-bottom border-secondary pb-3">
+                        <i class="bi bi-calendar-plus me-2 text-primary"></i>1. Crear Evento
+                    </h4>
+                    <form id="form-crear-evento">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary small fw-bold">Nombre del Evento</label>
+                                <input type="text" id="ev-nombre" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary small fw-bold">Artista Principal</label>
+                                <input type="text" id="ev-artista" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary small fw-bold">Fecha y Hora</label>
+                                <input type="datetime-local" id="ev-fecha" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label text-secondary small fw-bold">ID del Recinto</label>
+                                <input type="number" id="ev-recinto" class="form-control" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-tp w-100 py-2 fs-6 mt-auto"><i class="bi bi-cloud-arrow-up-fill me-2"></i>Publicar Evento</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- COLUMNA 2: CREAR SECTOR -->
+            <div class="col-lg-6 mb-4">
+                <div class="card-panel p-4 shadow-sm h-100">
+                    <h4 class="fw-bold mb-4 border-bottom border-secondary pb-3">
+                        <i class="bi bi-ticket-detailed me-2 text-warning"></i>2. Agregar Sectores (Tickets)
+                    </h4>
+                    <form id="form-crear-sector">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary small fw-bold">ID del Evento</label>
+                                <input type="number" id="sec-evento" class="form-control" required placeholder="Ej: 4">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary small fw-bold">Nombre del Sector</label>
+                                <input type="text" id="sec-nombre" class="form-control" required placeholder="Ej: Cancha VIP">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label text-secondary small fw-bold">Precio (CLP)</label>
+                                <input type="number" id="sec-precio" class="form-control" required placeholder="Ej: 25000">
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label text-secondary small fw-bold">Stock de Entradas</label>
+                                <input type="number" id="sec-stock" class="form-control" required placeholder="Ej: 500">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-tp w-100 py-2 fs-6 mt-auto" style="background-color: #ffc107; color: #000;"><i class="bi bi-tags-fill me-2"></i>Poner a la Venta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Login -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-panel">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title fw-bold">Acceso Productores</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small">Usuario Organizador</label>
+                            <input type="text" id="username" class="form-control" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-secondary small">Contraseña</label>
+                            <input type="password" id="password" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn-tp w-100">Ingresar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<footer class="text-center py-4 mt-5 border-top border-secondary">
+    <div class="container text-secondary small">
+        <p class="mb-1 fw-bold text-white">Desarrollo Backend - Evaluación 2</p>
+        <p class="mb-0">Desarrollado por: Fernando Soto Navarrete</p>
+        <p class="mb-0">Ingeniería en Ciberseguridad | INACAP - 2026</p>
+        <p class="mb-0">Sección: [IEC-N4-C1/D]</p>
+    </div>
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            verificarAutenticacion();
+
+            // Login
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                fetch('http://127.0.0.1:8000/api/login/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: document.getElementById('username').value, password: document.getElementById('password').value })
+                })
+                .then(r => { if(!r.ok) throw new Error(); return r.json(); })
+                .then(data => {
+                    localStorage.setItem('token_acceso', data.access);
+                    bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+                    verificarAutenticacion();
+                    document.getElementById('login-form').reset();
+                })
+                .catch(() => Swal.fire({ icon: 'error', title: 'Error', text: 'Credenciales inválidas', background: '#1e1e1e', color: '#fff' }));
+            });
+
+            // Logout
+            document.getElementById('btn-auth').addEventListener('click', function(e) {
+                if (localStorage.getItem('token_acceso')) {
+                    e.preventDefault(); localStorage.removeItem('token_acceso'); verificarAutenticacion();
+                }
+            });
+
+            // Crear Evento
+            document.getElementById('form-crear-evento').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const token = localStorage.getItem('token_acceso');
+                const datos = {
+                    nombre: document.getElementById('ev-nombre').value,
+                    artista: document.getElementById('ev-artista').value,
+                    fecha_hora: document.getElementById('ev-fecha').value,
+                    recinto: document.getElementById('ev-recinto').value
+                };
+                fetch('http://127.0.0.1:8000/api/organizador/eventos/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(datos)
+                })
+                .then(async r => {
+                    if (!r.ok) throw new Error(JSON.stringify(await r.json(), null, 2));
+                    return r.json();
+                })
+                .then(data => {
+                    Swal.fire({ icon: 'success', title: '¡Publicado!', text: `Evento creado con ID: ${data.evento.id}. Usa este ID para crear los sectores.`, background: '#1e1e1e', color: '#fff', confirmButtonColor: '#f2007a' });
+                    document.getElementById('form-crear-evento').reset();
+                })
+                .catch(err => Swal.fire({ icon: 'error', title: 'Atención', text: err.message, background: '#1e1e1e', color: '#fff' }));
+            });
+
+            // Crear Sector
+            document.getElementById('form-crear-sector').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const token = localStorage.getItem('token_acceso');
+                const datos = {
+                    evento: document.getElementById('sec-evento').value,
+                    nombre: document.getElementById('sec-nombre').value,
+                    precio: document.getElementById('sec-precio').value,
+                    stock_total: document.getElementById('sec-stock').value
+                };
+                fetch('http://127.0.0.1:8000/api/organizador/sectores/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(datos)
+                })
+                .then(async r => {
+                    if (!r.ok) throw new Error(JSON.stringify(await r.json(), null, 2));
+                    return r.json();
+                })
+                .then(data => {
+                    Swal.fire({ icon: 'success', title: '¡Tickets Listos!', text: 'El sector ha sido agregado al evento y ya está a la venta.', background: '#1e1e1e', color: '#fff', confirmButtonColor: '#ffc107' });
+                    document.getElementById('form-crear-sector').reset();
+                })
+                .catch(err => Swal.fire({ icon: 'error', title: 'Atención', text: err.message, background: '#1e1e1e', color: '#fff' }));
+            });
+        });
+
+        function verificarAutenticacion() {
+            const token = localStorage.getItem('token_acceso');
+            if (token) {
+                document.getElementById('btn-auth').innerHTML = 'Cerrar Sesión'; 
+                document.getElementById('btn-auth').removeAttribute('data-bs-toggle');
+                document.getElementById('panel-contenido').classList.remove('d-none');
+                document.getElementById('mensaje-bloqueo').classList.add('d-none');
+            } else {
+                document.getElementById('btn-auth').innerHTML = 'Iniciar Sesión'; 
+                document.getElementById('btn-auth').setAttribute('data-bs-toggle', 'modal');
+                document.getElementById('panel-contenido').classList.add('d-none');
+                document.getElementById('mensaje-bloqueo').classList.remove('d-none');
+            }
+        }
+    </script>
+</body>
+</html>
